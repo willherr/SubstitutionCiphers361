@@ -44,6 +44,14 @@ int main(int argc, char* argv[])
     exit(1);
   }
   
+  fin = fopen(argv[3], "r");
+  fout = fopen(argv[4], "w");
+    
+  if (fin ==  NULL || fout == NULL){
+    printf("File could not be opened\n");
+    exit(1);
+  }
+  
   choice = atoi(argv[1]);
   string = argv[2];
 
@@ -55,7 +63,16 @@ int main(int argc, char* argv[])
   
   initializeEncryptArray(key, encrypt);
   initializeDecryptArray(encrypt, decrypt);
-
+ 
+  
+  if (choice == 2){                  //decrypting
+    processInput(fin, fout, decrypt);
+  } else {                           //encrypting
+    processInput(fin, fout, encrypt);
+  }
+  
+  fclose(fin);
+  fclose(fout);
   free(key);
  
   return 0;
@@ -65,7 +82,13 @@ int main(int argc, char* argv[])
 
 //reading and writing encrypting/decrypting operation
 void processInput(FILE * inf, FILE * outf, char substitute[]){
-  
+  char ch;
+  int i = 0;
+
+  while ( fscanf(inf, "%c", &ch) != EOF ){
+    fprintf(outf, "%c", substitute[ch-'A']/*encrypt(ch, keyArray, i % lengthOfString)*/);
+    i++;
+  }
 }
 
 
@@ -135,5 +158,3 @@ char * removeDuplicates(char word []){
   printf("\nword: %s\nkey: %s\n", word, key);
   return key;
 }
-
-

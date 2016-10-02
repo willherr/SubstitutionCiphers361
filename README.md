@@ -1,4 +1,4 @@
-# SubstitutionCiphers361
+# SubstitutionCiphers361 - Finished at 2:12pm on October 12, 2016
 Project 1 for CIS 361
 
 CIS361 System Programming

@@ -1,61 +1,87 @@
-/**
-   Substitution Cipher - Project 1
-
-   William Herrmann
-   September 26th, 2016
- */
+/***********************************************************************
+ * Substitution Cipher - Project 1
+ *
+ * William Herrmann
+ * September 26th, 2016
+ **********************************************************************/
 
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define TRUE 1
-#define FALSE 0
+#define TRUE      1
+#define FALSE     0
 #define NUMALPHA 26
 
-// remove duplicate characters in array word and return the result string
+/************************************************************************
+ * remove duplicate characters in array word and return the result string
+ ***********************************************************************/
+
 char * removeDuplicates(char word []);
 
-// search the first num characters in array charArray for character target
-// return a non-zero integer if found, otherwise, return 0
+
+/************************************************************************
+ * search for a target character in array charArray found at an index 
+ * less than num. return a non-zero integer if found, otherwise return 0
+ ***********************************************************************/
+
 int targetFound(char charArray[], int num, char target);
 
-// initialize the encrypt array with appropriate cipher letters according to the given key
+
+/***********************************************************************
+ * initialize the encrypt array with appropriate cipher letters 
+ * according to the given key
+ **********************************************************************/
+
 void initializeEncryptArray(char key[], char encrypt[]);
 
-// initialize the decrypt array with appropriate substitute letters based on the encrypt array
+
+/***********************************************************************
+ * initialize the decrypt array with appropriate substitute letters 
+ * based on the encrypt array
+ **********************************************************************/
+
 void initializeDecryptArray(char encypt[], char decrypt[]);
 
-// process data from the input file and write the result to the output file
-// pass the encrypt array to parameter substitute if encryption is intended
-// pass the decrypt array to parameter substitute if decryption is intended
+
+/***********************************************************************
+ * process data from the input file and write the result to the output 
+ * file. pass the encrypt array to parameter substitute if encryption is 
+ * intended pass the decrypt array to parameter substitute if decryption
+ * is intended
+ **********************************************************************/
+
 void processInput(FILE * inf, FILE * outf, char substitute[]);
 
+
+/***********************************************************************
+ * main function to complete encryption/decryption of given files.
+ * command line arguments are cipher option, key, infile, outfile
+ **********************************************************************/
 int main(int argc, char* argv[])
 {
-  int choice;
-  char *string, *key, encrypt[NUMALPHA+1], decrypt[NUMALPHA+1];
+  int encrypting = TRUE;
+  char *key, encrypt[NUMALPHA+1], decrypt[NUMALPHA+1];
   FILE *fin, *fout;
   
   if (argc != 5){
-    printf ("Usage: cipher option, key (as uppercase string), infile, outfile\n");
-    printf ("Option 1 for encryption and 2 for decryption");
+    printf ("\nUsage: cipher option, key (as uppercase string), infile, outfile\n");
+    printf ("Option 1 for encryption and 2 for decryption\n\n");
     exit(1);
   }
   
+  if(atoi(argv[1]) == 2)
+    encrypting = FALSE;
+
   fin = fopen(argv[3], "r");
   fout = fopen(argv[4], "w");
-    
   if (fin ==  NULL || fout == NULL){
     printf("File could not be opened\n");
     exit(1);
   }
-  
-  choice = atoi(argv[1]);
-  string = argv[2];
 
-  key = removeDuplicates(string);
+  key = removeDuplicates(argv[2]);
   if(strlen(key) > NUMALPHA){
     fprintf(stdout, "\nYour key cannot be greater than 26 characters.\n");
     exit(1);
@@ -65,10 +91,12 @@ int main(int argc, char* argv[])
   initializeDecryptArray(encrypt, decrypt);
  
   
-  if (choice == 2){                  //decrypting
-    processInput(fin, fout, decrypt);
-  } else {                           //encrypting
+  if(encrypting){              
     processInput(fin, fout, encrypt);
+    fprintf(stdout, "The encrypted file %s has been created\n\n", argv[4]);
+  } else {                          
+    processInput(fin, fout, decrypt);
+    fprintf(stdout, "The decrypted file %s has been created\n\n", argv[4]);
   }
   
   fclose(fin);
@@ -85,8 +113,8 @@ void processInput(FILE * inf, FILE * outf, char substitute[]){
   char ch;
   int i = 0;
 
-  while ( fscanf(inf, "%c", &ch) != EOF ){
-    fprintf(outf, "%c", substitute[ch-'A']/*encrypt(ch, keyArray, i % lengthOfString)*/);
+  while (fscanf(inf, "%c", &ch) != EOF){
+    fprintf(outf, "%c", substitute[ch-'A']);
     i++;
   }
 }
@@ -100,9 +128,9 @@ void initializeDecryptArray(char encrypt[], char decrypt[]){
   for(i=0; i < NUMALPHA; i++){
     decrypt[encrypt[i]-'A'] = 'A' + i;
   }
-  decrypt[++i] = '\0';
+  decrypt[i] = '\0';
 
-  fprintf(stdout, "decrypt: %s\n\n", decrypt);
+  fprintf(stdout, "decrypt substitution: %s\n\n", decrypt);
 }
 
 
@@ -123,7 +151,7 @@ void initializeEncryptArray(char key[], char encrypt[]){
     }
   }
   encrypt[i] = '\0';
-  fprintf(stdout,"\nencrypt: %s\n", encrypt);
+  fprintf(stdout,"\nencrypt substitution: %s\n", encrypt);
 }
 
 
@@ -149,12 +177,11 @@ char * removeDuplicates(char word []){
 
   for(i=0; i < strlen(word); i++){
     if(!targetFound(word, i, word[i])){
-      key[k] = word[i]; //maybe combine next two lines?
-      k++;
+      key[k++] = word[i];
     }
   }
   key[k] = '\0';
 
-  printf("\nword: %s\nkey: %s\n", word, key);
+  printf("\nword in: %s\nkey: %s\n", word, key);
   return key;
 }

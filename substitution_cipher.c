@@ -48,7 +48,14 @@ int main(int argc, char* argv[])
   string = argv[2];
 
   key = removeDuplicates(string);
+  if(strlen(key) > NUMALPHA){
+    fprintf(stdout, "\nYour key cannot be greater than 26 characters.\n");
+    exit(1);
+  }
   
+  initializeEncryptArray(key, encrypt);
+  initializeDecryptArray(encrypt, decrypt);
+
   free(key);
  
   return 0;
@@ -65,14 +72,35 @@ void processInput(FILE * inf, FILE * outf, char substitute[]){
 
 //decrypt array initialization
 void initializeDecryptArray(char encrypt[], char decrypt[]){
+  int i;
   
+  for(i=0; i < NUMALPHA; i++){
+    decrypt[encrypt[i]-'A'] = 'A' + i;
+  }
+  decrypt[++i] = '\0';
+
+  fprintf(stdout, "decrypt: %s\n\n", decrypt);
 }
 
 
 
 //encrypt array initialization
 void initializeEncryptArray(char key[], char encrypt[]){
-  
+  int i, k = 0;
+
+  for(i=0; i < NUMALPHA; i++){
+    if(i < strlen(key)){
+      encrypt[i] = key[i];
+    } else {
+      if(!targetFound(key, NUMALPHA + 1, 'Z' - k))
+	encrypt[i] = 'Z' - k;
+      else
+	i--;
+      k++;
+    }
+  }
+  encrypt[i] = '\0';
+  fprintf(stdout,"\nencrypt: %s\n", encrypt);
 }
 
 
@@ -107,3 +135,5 @@ char * removeDuplicates(char word []){
   printf("\nword: %s\nkey: %s\n", word, key);
   return key;
 }
+
+
